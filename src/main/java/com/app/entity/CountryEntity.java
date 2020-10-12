@@ -32,6 +32,6 @@ public class CountryEntity {
 	@Column(name="country_name")
 	private String countryName;
     @OneToMany
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "country_idfk")
 	private Set<StateEntity> state;
 }
