@@ -31,7 +31,8 @@ public class CountryEntity {
 
 	@Column(name="country_name")
 	private String countryName;
-    @OneToMany
-    @JoinColumn(name = "country_idfk")
-	private Set<StateEntity> state;
+//    @OneToMany
+//    @JoinColumn(name = "country_idfk")
+//	private Set<StateEntity> state;
+	
 }

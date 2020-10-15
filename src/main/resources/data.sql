@@ -1,0 +1,14 @@
+Insert Into country_master Values(1,'+91','India');
+Insert Into country_master Values(2,'+1','Usa');
+Insert Into state_master Values(1,1,'Andhra Pradesh');
+Insert Into state_master Values(2,1,'Karnataka');
+Insert Into state_master Values(3,2,'New Jersy');
+Insert into state_master values(4,2,'Ohio');
+Insert Into city_master Values(1,'Vizag',1);
+Insert Into city_master Values(2,'Guntur',1);
+Insert Into city_master Values(3,'Banglore',2);
+Insert Into city_master Values(4,'Mysore',2);
+Insert Into city_master Values(6,'Maywood',3);
+Insert Into city_master Values(7,'Westwood',3);
+Insert Into city_master Values(8,'Oakwood',4);
+Insert Into city_master Values(9,'Cuyahoga County',4);

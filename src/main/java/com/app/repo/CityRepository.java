@@ -1,9 +1,13 @@
 package com.app.repo;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.app.entity.CityEntity;
+import com.app.entity.StateEntity;
 
 public interface CityRepository extends JpaRepository<CityEntity, Integer> {
-
+   
+	public List<CityEntity> findByStateId(Integer countryId);
 }

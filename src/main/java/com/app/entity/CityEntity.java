@@ -17,5 +17,7 @@ public class CityEntity {
     @Column(name="city_id")
 	private Integer cityId;
     @Column(name="city_name")
-	private Integer cityName;
+	private String cityName;
+    @Column(name="state_id")
+    private String stateId;
 }

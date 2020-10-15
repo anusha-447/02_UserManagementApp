@@ -20,9 +20,12 @@ public class StateEntity {
 	@GeneratedValue
 	@Column(name="state_id")
 	private Integer stateId;
+	@Column(name="country_id")
+	private String countryId;
 	@Column(name="state_name")
 	private String stateName;
-    @OneToMany
-    @JoinColumn(name="state_idfk")
-	private Set<CityEntity> city;
+//    @OneToMany
+//    @JoinColumn(name="state_idfk")
+//	private Set<CityEntity> city;
+	
 }
