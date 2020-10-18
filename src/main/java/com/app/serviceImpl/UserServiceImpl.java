@@ -1,8 +1,13 @@
 package com.app.serviceImpl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +23,8 @@ import com.app.repo.CountryRepository;
 import com.app.repo.StateRepository;
 import com.app.repo.UserRepository;
 import com.app.service.IUserService;
+import com.app.util.EmailUtil;
+
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -29,12 +36,22 @@ public class UserServiceImpl implements IUserService {
 	private CityRepository cityrepo;
 	@Autowired
 	private UserRepository urepo;
+	@Autowired
+	private EmailUtil emailUtil;
 	@Override
 	public Boolean saveUser(User user) {
-    UserEntity userEntity=new UserEntity();
+		Boolean isSentSuccess=false;
+		user.setAccountStatus("LOCKED");
+		user.setUserPassword(generateTempPassword());
+        UserEntity userEntity=new UserEntity();
 		BeanUtils.copyProperties(user,userEntity);
+		
 		UserEntity userSaved = urepo.save(userEntity);
-		return userSaved.getUserId()!=null?true:false; 
+		if(userSaved.getUserId()!=null) {
+			String subject="Registration Successfully Completed|Anusha-SoftwareDeveloper";
+		isSentSuccess=getRegSuccessEmail(user.getUserEmail(),subject,sendRegSuccessEmail(user));
+		}
+		return isSentSuccess;
 		
 	}
 
@@ -79,15 +96,30 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Boolean sendRegSuccessEmail(User user) {
-		// TODO Auto-generated method stub
-		return null;
+	public String sendRegSuccessEmail(User user) {
+		String mailBody=null;
+		List<String> replacedLines=null;
+		try {
+			
+			Stream<String> fileData = Files.lines(Paths.get("UNLOCK-MSG"));
+			replacedLines=fileData.map(line->
+			line.replace("{FNAME}",user.getFirstName())
+			.replace("{LNAME}", user.getLastName())
+			.replace("{TEMP-PWD}",user.getUserPassword())
+			.replace("{EMAIL}", user.getUserEmail())).collect(Collectors.toList());
+			mailBody = String.join("", replacedLines);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return mailBody;
 	}
 
 	@Override
-	public String getRegSuccessEmail(String to, String subject, String body) {
+	public Boolean getRegSuccessEmail(String to, String subject, String body) {
 		// TODO Auto-generated method stub
-		return null;
+		
+		return emailUtil.sendMail(to, subject, body) ;
 	}
 
 	@Override

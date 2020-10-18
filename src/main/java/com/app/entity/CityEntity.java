@@ -19,5 +19,5 @@ public class CityEntity {
     @Column(name="city_name")
 	private String cityName;
     @Column(name="state_id")
-    private String stateId;
+    private Integer stateId;
 }

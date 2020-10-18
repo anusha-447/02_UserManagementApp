@@ -3,7 +3,7 @@ package com.app.service;
 import java.util.List;
 
 import com.app.model.City;
-import com.app.model.State;
+
 
 public interface ICityService {
 

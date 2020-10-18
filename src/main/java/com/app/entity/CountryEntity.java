@@ -1,13 +1,12 @@
 package com.app.entity;
 
-import java.util.Set;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -31,8 +30,6 @@ public class CountryEntity {
 
 	@Column(name="country_name")
 	private String countryName;
-//    @OneToMany
-//    @JoinColumn(name = "country_idfk")
-//	private Set<StateEntity> state;
+
 	
 }

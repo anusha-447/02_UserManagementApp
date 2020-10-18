@@ -1,18 +1,73 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
      <%@ taglib uri = "http://www.springframework.org/tags/form" prefix="form" %>
+
+<!DOCTYPE html>
+<html>
+<head>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <!------ Include the above in your HEAD tag ---------->
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-<!DOCTYPE html>
-<html>
-<head>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <meta charset="ISO-8859-1">
 <title>User page</title>
+<script>
+$(document).ready(function() {
+	$("#userEmail").blur(function() {
+		$("#errMsg").text("");
+		 $.ajax({
+				
+				type : "GET",
+				url : "isUniqueMail?email="+$("#userEmail").val(),
+				success : function(data) {
+					
+						if(data=="EXISTED"){
+							alert(data)
+							$("#errMsg").text("Duplicate Email");
+							 $("#submitBtn").prop("disabled", true);
+						}
+						 else{
+							$("#submitBtn").prop("disabled", false);
+						} 
+				}
+				});
+			
+		});
+	$("#countryId").change(function(){
+		$('#stateId').find('option:not(:first)').remove();
+		$('#cityId').find('option:not(:first)').remove();
+		$.ajax({
+			
+			type : "GET",
+			url : "countryChange?countryId="+$("#countryId").val(),
+			success : function(data) {
+				$.each(data, function(stateId, stateName) {
+		            $('#stateId').append($('<option>').text(stateName).attr('value', stateId))
+				
+				 });
+			}
+	});
+});
+	$("#stateId").change(function(){
+		$('#cityId').find('option:not(:first)').remove();
+		$.ajax({
+			type : "GET",
+			url : "stateChange?stateId="+$("#stateId").val(),
+			success : function(data) {
+				$.each(data, function(cityId, cityName) {
+		            $('#cityId').append($('<option>').text(cityName).attr('value', cityId));
+		        });
+			}
+		});
+	});
+	
+});
+</script>
 </head>
 <style>
 .card{
@@ -37,6 +92,7 @@ width: 276px;
 }
 
 </style>
+
 <body>
 
 
@@ -71,32 +127,34 @@ width: 276px;
    <br><br>   
     <span>DOB:</span> <form:input class="input-field" type="text" path="dob"></form:input>
     <br><br>
-  <span>Email:</span> <form:input class="input-field" type="text" path="userEmail"></form:input>
-<br><br>
+  <span >Email:</span> <form:input id="userEmail" class="input-field" type="text" path="userEmail"></form:input> <font color='red'><span  id="errMsg"></span></font> 
+<br>
+
+<br>
 <label>
-Country  : <form:select class="input-field" path="countryId">  
-        <form:option value = "NONE" label = "Select"/>
-            <form:options items = "${countries}" />     
-                </form:select>     
+Country  : <form:select class="input-field" path="countryId" id="countryId">
+							<form:option value="">-Select Country-</form:option>
+							<form:options items="${countries}" />
+						</form:select>
+                    
         </label> 
       
         <br><br>
-State           : <form:select class="input-field" path="stateId">  
-        <form:option value="Ghaziabad" label="Ghaziabad"/>  
-        <form:option value="Modinagar" label="Modinagar"/>  
-        <form:option value="Meerut" label="Meerut"/>  
-        <form:option value="Amristar" label="Amristar"/>  
-        </form:select>  
+State :<form:select class="input-field" path="stateId" id="stateId">
+							<form:option value="">-Select State-</form:option>
+							<form:options items="${stateslist}" />
+						</form:select>
         <br><br>
-City           : <form:select class="input-field" path="cityId">  
-        <form:option value="Ghaziabad" label="Ghaziabad"/>  
-        <form:option value="Modinagar" label="Modinagar"/>  
-        <form:option value="Meerut" label="Meerut"/>  
-        <form:option value="Amristar" label="Amristar"/>  
+ City           : <form:select class="input-field" id="cityId" path="cityId">  
+        <form:option value="">-Select Cities-</form:option>
+							<form:options items="${cities}" />
         </form:select>  
-        <br><br>        
+        <br><br>       
+
+<input class="align-center"  id="submitBtn" type="submit" value="Register">
 </form:form>
-<input class="align-center"type="submit" value="Register">
+<font color='green'>${success}</font>
+<font color='red'>${fail}</font>
 </div>
 
 <div class="col-sm-2">

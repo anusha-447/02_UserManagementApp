@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
 import com.app.model.User;
 import com.app.service.IUserService;
 
@@ -23,14 +24,18 @@ public class UserRegistrationController {
 	@Autowired
 	private IUserService uservice;
 	
+	@ModelAttribute
+	public void loadForm(Model model) {
+		User user=new User();
+		model.addAttribute("user",user);
+		model.addAttribute("countries",uservice.loadAllCountries());
+	}
+	
+	
 	@GetMapping("/showPage")
 	public String showRegistrationPage(Model model) {
-		model.addAttribute("user",new User());
-		model.addAttribute("countries",uservice.loadAllCountries());
-	
-	
 		
-        return "UserRegistration";
+	 return "UserRegistration";
 	}
 	/**
 	 * for validating email
@@ -38,24 +43,27 @@ public class UserRegistrationController {
 	 * @param model
 	 * @return
 	 */
-	@PostMapping("/isUniqueMail")
+	@GetMapping("/isUniqueMail")
 	public @ResponseBody String validateEmail(@RequestParam("email")String email) {
-		String resp="";
-		return resp;
+		return uservice.isUniqueEmail(email)==true?"EXISTED":"NOT EXISTED ";
 	}
 	/**
-	 * 
+	 *  
 	 * @param user
 	 * @param model
 	 * @return
 	 */
 	@PostMapping("/save")
 	public String saveUser(User user,Model model) {
-		user.setAccountStatus("LOCKED");
-		user.setUserPassword(uservice.generateTempPassword());
-		uservice.saveUser(user);
+    Boolean isSaved=uservice.saveUser(user);
+		if(isSaved) {
+			model.addAttribute("success","user saved successfully");
+		}
+		else {
+			model.addAttribute("fail","something went wrong");
+		}
+		return "redirect:/showPage";
 		
-		return "UserRegistration";
 	}
 	/**
 	 * to get states by country id
@@ -64,11 +72,10 @@ public class UserRegistrationController {
 	 */
 	@GetMapping("/countryChange")
 	public @ResponseBody Map<Integer,String> handleCountryChangeEvent(@RequestParam("countryId") Integer countryId) {
-		 Map<Integer,String> states=uservice.getStatesByCountryId(countryId);
-		 states.forEach((k, v) -> {
-				System.out.println("Key: " + k + ", Value: " + v);
-			});
-					return states;
+		
+		Map<Integer,String> stateslist= uservice.getStatesByCountryId(countryId);
+		
+		return stateslist;
 		 
 	}
 	/**
@@ -78,7 +85,7 @@ public class UserRegistrationController {
 	 */
 	@GetMapping("/stateChange")
 	public @ResponseBody Map<Integer,String> handleStateChangeEvent(@RequestParam("stateId") Integer stateId) {
-		 Map<Integer,String> sates=new HashMap<Integer,String>();
-		return sates;
+		 Map<Integer,String> cities=uservice.getCitiesByStateId(stateId);
+		return cities;
 	}
 }

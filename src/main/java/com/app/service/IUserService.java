@@ -1,7 +1,6 @@
 package com.app.service;
 
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -22,9 +21,9 @@ public interface IUserService {
 	
 	public Map<Integer,String> getCitiesByStateId(Integer stateId);
 	
-	public Boolean sendRegSuccessEmail(User user);
+	public String sendRegSuccessEmail(User user);
 	
-    public String getRegSuccessEmail(String to,String subject,String body);
+    public Boolean getRegSuccessEmail(String to,String subject,String body);
     
     public String generateTempPassword();
     //unlock screen methods
