@@ -27,7 +27,7 @@ $(document).ready(function() {
 				success : function(data) {
 					
 						if(data=="EXISTED"){
-							alert(data)
+						
 							$("#errMsg").text("Duplicate Email");
 							 $("#submitBtn").prop("disabled", true);
 						}
@@ -108,7 +108,11 @@ width: 276px;
   <b class="text-colr">Registration Page</b>
   </div>
   <div class="card-body">
-
+  <br><br>
+  <div align="center">
+<font color='green' >${success}</font>
+<font color='red'>${fail}</font>
+</div>
   <div class="row">
   <div class="col-sm-1">
 </div>
@@ -153,8 +157,7 @@ State :<form:select class="input-field" path="stateId" id="stateId">
 
 <input class="align-center"  id="submitBtn" type="submit" value="Register">
 </form:form>
-<font color='green'>${success}</font>
-<font color='red'>${fail}</font>
+
 </div>
 
 <div class="col-sm-2">

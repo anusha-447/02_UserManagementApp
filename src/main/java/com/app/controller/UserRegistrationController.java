@@ -1,7 +1,7 @@
 package com.app.controller;
 
 
-import java.util.HashMap;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
+import com.app.constants.AppConstants;
 import com.app.model.User;
 import com.app.service.IUserService;
 
@@ -27,15 +28,14 @@ public class UserRegistrationController {
 	@ModelAttribute
 	public void loadForm(Model model) {
 		User user=new User();
-		model.addAttribute("user",user);
-		model.addAttribute("countries",uservice.loadAllCountries());
+		model.addAttribute(AppConstants.USER,user);
+		
+		model.addAttribute(AppConstants.COUNTRIES,uservice.loadAllCountries());
 	}
-	
-	
 	@GetMapping("/showPage")
 	public String showRegistrationPage(Model model) {
 		
-	 return "UserRegistration";
+	 return AppConstants.REGISTRATION_VIEW;
 	}
 	/**
 	 * for validating email
@@ -45,7 +45,7 @@ public class UserRegistrationController {
 	 */
 	@GetMapping("/isUniqueMail")
 	public @ResponseBody String validateEmail(@RequestParam("email")String email) {
-		return uservice.isUniqueEmail(email)==true?"EXISTED":"NOT EXISTED ";
+		return uservice.isUniqueEmail(email)==true?AppConstants.EXISTED:AppConstants.NOT_EXISTED;
 	}
 	/**
 	 *  
@@ -54,13 +54,14 @@ public class UserRegistrationController {
 	 * @return
 	 */
 	@PostMapping("/save")
-	public String saveUser(User user,Model model) {
+	public String saveUser(User user,RedirectAttributes model) {
     Boolean isSaved=uservice.saveUser(user);
 		if(isSaved) {
-			model.addAttribute("success","user saved successfully");
+			model.addFlashAttribute(AppConstants.SUCCESS,"User Registerd successfully..Please Check Your Email");
+			
 		}
 		else {
-			model.addAttribute("fail","something went wrong");
+			model.addFlashAttribute(AppConstants.FAILED,"something went wrong");
 		}
 		return "redirect:/showPage";
 		

@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.app.constants.AppConstants;
 import com.app.entity.CityEntity;
 import com.app.entity.CountryEntity;
 import com.app.entity.StateEntity;
@@ -41,15 +42,15 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public Boolean saveUser(User user) {
 		Boolean isSentSuccess=false;
-		user.setAccountStatus("LOCKED");
+		user.setAccountStatus(AppConstants.LOCKED);
 		user.setUserPassword(generateTempPassword());
         UserEntity userEntity=new UserEntity();
 		BeanUtils.copyProperties(user,userEntity);
 		
 		UserEntity userSaved = urepo.save(userEntity);
 		if(userSaved.getUserId()!=null) {
-			String subject="Registration Successfully Completed|Anusha-SoftwareDeveloper";
-		isSentSuccess=getRegSuccessEmail(user.getUserEmail(),subject,sendRegSuccessEmail(user));
+			
+		isSentSuccess=getRegSuccessEmail(user.getUserEmail(),AppConstants.SUBJECT,sendRegSuccessEmail(user));
 		}
 		return isSentSuccess;
 		
@@ -124,20 +125,16 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public String generateTempPassword() {
-		String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				+ "0123456789"
-				+ "abcdefghijklmnopqrstuvxyz"; 
-
 		// create StringBuffer size of AlphaNumericString 
-		StringBuilder sb = new StringBuilder(6); 
+		StringBuilder sb = new StringBuilder(AppConstants.PW_LENGHT); 
 
-		for (int i = 0; i < 6; i++) { 
+		for (int i = 0; i < AppConstants.PW_LENGHT; i++) { 
 
 			// generate a random number between 
 			// 0 to AlphaNumericString variable length 
-			int index = (int)(AlphaNumericString.length()* Math.random()); 
+			int index = (int)(AppConstants.ALPHA_NUMERIC_STRING.length()* Math.random()); 
 			// add Character one by one in end of sb 
-			sb.append(AlphaNumericString.charAt(index)); 
+			sb.append(AppConstants.ALPHA_NUMERIC_STRING.charAt(index)); 
 					 
 		} 
 
@@ -146,40 +143,90 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public Boolean isTempPwdValid(String email, String temPwd) {
-		// TODO Auto-generated method stub
-		return null;
+		UserEntity getUser=urepo.findByUserEmailAndUserPassword(email,temPwd);
+		return getUser!=null?true:false;
 	}
 
 	@Override
-	public Boolean unlockAccount(String emial, String tempPwd) {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean unlockAccountForUser(String email, String pwd) {
+		UserEntity entity=urepo.findByUserEmail(email);
+		entity.setAccountStatus(AppConstants.UN_LOCKED);
+		entity.setUserPassword(pwd);
+		UserEntity getUser=urepo.save(entity);
+		return getUser.getUserId()!=null?true:false;
 	}
 
 	@Override
 	public String loginCheck(String email, String pwd) {
-		// TODO Auto-generated method stub
-		return null;
+		UserEntity entity=urepo.findByUserEmailAndUserPassword(email, pwd);
+		if(entity==null) {
+			return AppConstants.IN_VALID;
+		}
+		else if(entity!=null && (entity.getAccountStatus()).equals(AppConstants.LOCKED)) {
+			return AppConstants.LOCKED;
+		}
+	
+	    else {
+		return AppConstants.VALID;
 	}
-
+	}
 	@Override
 	public String recoverPassword(String email) {
-		// TODO Auto-generated method stub
-		return null;
+		UserEntity userEntity=urepo.findByUserEmail(email);
+		
+		if(userEntity!=null) {
+			
+			User user=new User();
+			BeanUtils.copyProperties(userEntity,user);
+			
+		    sendPwdToEmail(email, AppConstants.SUBJECT_FOR_RECOVERPW,getRecoverPwdEmailBody(user));
+			return AppConstants.VALID;
+		}
+		else 
+		{
+		return AppConstants.IN_VALID;
+		}
 	}
 
 	@Override
-	public String getRecoverPwdEmailBody() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getRecoverPwdEmailBody(User user) {
+		String mailBody=null;
+		List<String> replacedLines=null;
+		try {
+			
+			Stream<String> fileData = Files.lines(Paths.get("FORGOT-PASSWORD"));
+			replacedLines=fileData.map(line->
+			line.replace("{FNAME}",user.getFirstName())
+			.replace("{LNAME}", user.getLastName())
+			.replace("{PWD}",user.getUserPassword()))
+			.collect(Collectors.toList());
+			mailBody = String.join("", replacedLines);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return mailBody;
+		
+		
+  
+		
 	}
 
 	@Override
-	public String sendPwdToEmail(String email) {
+	public Boolean sendPwdToEmail(String to,String subject,String body) {
 		// TODO Auto-generated method stub
-		return null;
+		return emailUtil.sendMail(to, subject, body);
 	}
 
-
+public String disableLinkToAfterUnlock(String email) {
+	UserEntity userEntity=urepo.findByUserEmail(email);
+	if((userEntity.getAccountStatus()).equals(AppConstants.UN_LOCKED )) {
+		return AppConstants.UN_LOCKED;
+	}
+	else {
+		return AppConstants.LOCKED;
+	}
+	
+}
 
 }

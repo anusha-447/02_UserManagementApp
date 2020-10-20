@@ -30,7 +30,7 @@ public interface IUserService {
    
     public Boolean isTempPwdValid(String email,String temPwd);
     
-    public Boolean unlockAccount(String emial,String tempPwd);
+    public Boolean unlockAccountForUser(String email,String pwd);
 	//Sign-In screen methods
 	
 	public String loginCheck(String email,String pwd);
@@ -38,8 +38,10 @@ public interface IUserService {
 	//forgot password screen methods
 	public String recoverPassword(String email);
 	
-	public String getRecoverPwdEmailBody();
+	public String getRecoverPwdEmailBody(User user);
 	
-	public String sendPwdToEmail(String email);
+	public Boolean sendPwdToEmail(String to,String subject,String body);
+	
+	public String disableLinkToAfterUnlock(String email);
 
 }
