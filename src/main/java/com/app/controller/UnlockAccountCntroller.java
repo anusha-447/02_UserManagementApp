@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.app.config.AppPropertiesConfig;
 import com.app.constants.AppConstants;
 import com.app.model.UnlockAccount;
 import com.app.service.IUserService;
@@ -16,6 +17,8 @@ import com.app.service.IUserService;
 public class UnlockAccountCntroller {
 	@Autowired
 	private  IUserService userService;
+	@Autowired
+	private AppPropertiesConfig appProps;
 
 	@GetMapping("/unlock")
 	public String showUnlockAccountPage(@RequestParam("email") String email,Model model) {
@@ -38,14 +41,14 @@ public class UnlockAccountCntroller {
 		
 		if(isPwdValid) {
 			userService.unlockAccountForUser(userAcc.getEmail(), userAcc.getNewPw());
-			model.addAttribute(AppConstants.SUCCESS, "Please login" );
+			model.addAttribute(AppConstants.SUCCESS, appProps.getMessages().get("successMsg") );
 			
 		
 			return "redirect:/loadLogin";
 			
 		}
 		else {
-			model.addAttribute(AppConstants.FAILED, "Please Enter Yout Temporary password");
+			model.addAttribute(AppConstants.FAILED, appProps.getMessages().get("failMsg"));
 			
 
 		}
